@@ -17,9 +17,11 @@ io.on('connection', async (socket) => {
   socket.emit('chat message', 'Lista de livros:');
 
   const bookRepo = AppDataSource.getRepository(Book);
-  const books = await bookRepo.find();
+  if (bookRepo) {
+    const books = await bookRepo.find();
 
-  socket.emit('allBooks', books);
+    socket.emit('allBooks', books);
+  }
 
   socket.on('new book', async (msg) => {
     const newBook = bookRepo.create({ title: `${msg}` });
