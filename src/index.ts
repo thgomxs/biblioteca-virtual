@@ -32,7 +32,7 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('Usuário saiu da biblioteca :(');
+    console.log('Usuário saiuu da biblioteca :(');
   });
 });
 
