@@ -1,5 +1,6 @@
 node_modules/
 dist/
+*.sqlite
 
 # dotenv environment variable files
 .env
