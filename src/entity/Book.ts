@@ -8,9 +8,15 @@ export class Book {
   @Column()
   title!: string;
 
-  // @Column()
-  // cover!: string;
+  @Column()
+  cover!: string;
 
-  // @Column()
-  // price!: string;
+  @Column()
+  price!: string;
+
+  @Column()
+  category!: string
+
+  @Column()
+  url!: string
 }
