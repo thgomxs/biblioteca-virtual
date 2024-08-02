@@ -14,22 +14,33 @@ app.use(express.static('public'));
 io.on('connection', async (socket) => {
   console.log('Uusário entrou na biblioteca!');
 
-  socket.emit('chat message', 'Lista de livros:');
-
   const bookRepo = AppDataSource.getRepository(Book);
   if (bookRepo) {
     const books = await bookRepo.find();
-
     socket.emit('allBooks', books);
+  }
+
+  async function sendBooks(){
+    const books = await bookRepo.find();
+    io.emit('allBooks', books)
   }
 
   socket.on('new book', async (msg) => {
     const newBook = bookRepo.create({ title: `${msg}` });
     await bookRepo.save(newBook);
 
-    const books = await bookRepo.find();
-    io.emit('allBooks', books);
+    sendBooks()
   });
+
+  socket.on('remove book', async(bookID)=>{
+    const book = await bookRepo.find({where: {id: bookID}})
+    
+    if (book){
+      await bookRepo.remove(book)
+    }
+
+    sendBooks()
+  })
 
   socket.on('disconnect', () => {
     console.log('Usuário saiu da biblioteca :(');

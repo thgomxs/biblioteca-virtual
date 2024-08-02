@@ -1,7 +1,7 @@
 const socket = io();
 const form = document.querySelector('#form');
 const input = document.querySelector('#input');
-const messages = document.querySelector('#messages');
+const books = document.querySelector('#books');
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -11,20 +11,25 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-function createLine(text) {
-  const item = document.createElement('li');
-  item.textContent = text;
-  messages.appendChild(item);
+function createBook(book) {
+  books.innerHTML += `
+  <div class="book border m-2 d-flex align-items-center justify-content-center gap-2">
+    <p class="book-title mb-0">${book.title}</p>
+    <input type="button" class="btn btn-danger" book-id="${book.id}" value="Remover"  onclick="removeBook(event)">
+  </div>`
   window.scrollTo(0, document.body.scrollHeight);
 }
 
-socket.on('chat message', (msg) => {
-  createLine(msg);
-});
+function removeBook(e){
+  let bookID = e.target.getAttribute('book-id')
 
-socket.on('allBooks', (books) => {
-  messages.innerHTML = '';
-  books.forEach((book) => {
-    createLine(book.title);
+  socket.emit('remove book', bookID)
+}
+
+socket.on('allBooks', (allBooks) => {
+  books.innerHTML = '';
+  console.log('rodou');
+  allBooks.forEach((book) => {
+    createBook(book);
   });
 });
