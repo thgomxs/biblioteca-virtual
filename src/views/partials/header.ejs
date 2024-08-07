@@ -1,0 +1,98 @@
+<form id="loginForm" class="needs-validation">
+  <div class="modal fade" id="login" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="login" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-body pt-4 d-flex flex-column gap-3">
+          <button type="button" class="auth-close btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px; top: 15px"></button>
+          <div class="form-group w-100">
+            <label class="form-label">Usuário</label>
+            <input class="form-control" type="text" name="username" required />
+          </div>
+
+          <div class="form-group w-100">
+            <label class="form-label">Senha</label>
+            <input class="form-control" type="password" name="password" required />
+          </div>
+        </div>
+        <div class="modal-footer justify-content-start pt-0 border-top-0">
+          <button class="btn btn-success text-white text-uppercase fw-bolder auth-button" type="submit">LOGIN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<form id="registerForm" class="needs-validation">
+  <div class="modal fade" id="register" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="login" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-body pt-4 d-flex flex-column gap-3">
+          <button type="button" class="auth-close btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px; top: 15px"></button>
+
+          <div class="form-group w-100">
+            <label class="form-label">Usuário</label>
+            <input class="form-control" type="text" name="username" required />
+          </div>
+
+          <div class="form-group w-100">
+            <label class="form-label">Senha</label>
+            <input class="form-control" type="password" name="password" required />
+          </div>
+
+          <div class="form-group w-100">
+            <label class="form-label">Confirmar senha</label>
+            <input class="form-control" type="password" name="confirmPassword" required />
+          </div>
+        </div>
+        <div class="modal-footer justify-content-start pt-0 border-top-0">
+          <button class="btn btn-success text-white text-uppercase fw-bolder auth-button" type="submit">CRIAR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<header class="navbar navbar-expand-lg bg-success">
+  <div class="z-3 container-fluid bg-success px-5 d-flex align-content-between justify-content-between">
+    <a class="navbar-brand text-white" href="/">
+      <img style="height: 50px" src="./images/logo.png" alt="LOGO NOME" />
+    </a>
+
+    <div class="collapse navbar-collapse pt-3 pb-3" id="navbarSupportedContent">
+      <ul class="navbar-nav gap-4 mb-2 ms-auto mb-lg-0">
+        <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+          <ul class="navbar-nav d-flex justify-content-center align-items-center gap-3">
+            <% if (user) { %>
+
+            <li class="profile-li nav-item dropdown">
+              <button class="btn dropdown-toggle d-flex flex-row justify-content-center align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+                <i id="profileIcon" class="fs-4 bi bi-person-circle me-2 lb-item-color" style="cursor: pointer"></i>
+                <p class="mb-0 text-uppercase fw-bold lb-item-color"><%= user.username %></p>
+              </button>
+
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li>
+                  <a class="dropdown-item" href="#">Início</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">Perfil</a>
+                </li>
+                <li class="logout-li">
+                  <a class="dropdown-item" href="/logout">Sair <i class="navbar-text text-danger fs-6 bi bi-box-arrow-right"></i></a>
+                </li>
+              </ul>
+            </li>
+
+            <% } else { %>
+
+            <li class="login-li nav-item fw-bold text-uppercase lb-item-color" data-bs-toggle="modal" data-bs-target="#login" style="cursor: pointer">Login</li>
+            <li class="register-li nav-item fw-bold text-uppercase lb-item-color" data-bs-toggle="modal" data-bs-target="#register" style="cursor: pointer">Criar conta</li>
+
+            <% } %>
+          </ul>
+        </div>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<div class="content-bg"></div>
