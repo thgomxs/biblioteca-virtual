@@ -176,3 +176,44 @@ body {
 
   overflow-y: auto;
 }
+
+.heart-like{
+  color: #9ab;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: 500ms;
+}
+.heart-like:hover{
+  color: #9ab9;
+  font-size: 2.15rem;
+}
+
+.heart-like.active{
+  color: red;
+  cursor: pointer;
+}
+
+.book-read{
+  color: #9ab;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: 500ms;
+}
+.book-read:hover{
+  color: #9ab9;
+  font-size: 2.15rem;
+}
+
+.book-read.active{
+  color: green;
+  cursor: pointer;
+}
+
+.bi.active ~ p {
+  color: #678 !important
+}
+
+#stats-container{
+  background-color: #455567;
+  color: #bcd;
+}
