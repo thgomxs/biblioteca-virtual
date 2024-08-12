@@ -26,27 +26,34 @@
               </p>
             </div>
 
-            <div id="stats-container" class="rounded mt-4 p-4">
-              <div class="w-100 d-flex justify-content-evenly align-items-center">
-                <div class="d-flex justify-content-evenly align-items-center flex-column flex-column">
-                  <% if (read) { %>
-                    <i class="book-read bi bi-book-fill active"></i>
-                    <% } else { %>
-                      <i class="book-read bi bi-book-fill "></i>
-                      <% } %>
-                        <span>Leu</span>
+            <div id="stats-container" class="d-flex flex-column justify-content-center align-items-center mt-4 gap-1">
+              <% if (user) { %>
+                <div class="w-100 d-flex justify-content-evenly align-items-center p-4">
+                  <div class="d-flex justify-content-evenly align-items-center flex-column flex-column">
+                    <% if (read) { %>
+                      <i class="book-read bi bi-book-fill active"></i>
+                      <% } else { %>
+                        <i class="book-read bi bi-book-fill "></i>
+                        <% } %>
+                          <span>Leu</span>
+                  </div>
+
+                  <div class="d-flex justify-content-evenly align-items-center flex-column flex-column">
+                    <% if (liked) { %>
+                      <i class="heart-like bi bi-heart-fill active"></i>
+                      <% } else { %>
+                        <i class="heart-like bi bi-heart-fill "></i>
+                        <% } %>
+                          <span>Curtiu</span>
+                  </div>
                 </div>
 
-                <div class="d-flex justify-content-evenly align-items-center flex-column flex-column">
-                  <% if (liked) { %>
-                    <i class="heart-like bi bi-heart-fill active"></i>
-                    <% } else { %>
-                      <i class="heart-like bi bi-heart-fill "></i>
-                      <% } %>
-                        <span>Curtiu</span>
+                <div class="w-100 d-flex justify-content-evenly align-items-center">
+                  <button data-bs-toggle="modal" data-bs-target="#rate" class="btn">Fazer análise</button>
                 </div>
-              </div>
-
+                <% } else { %>
+                  <button data-bs-toggle="modal" data-bs-target="#login" class="btn">Faça login para análise</button>
+                  <% } %>
             </div>
 
           </div>
@@ -54,8 +61,13 @@
           <div>
             <div id="book-header" class="d-flex flex-column justify-content-start">
               <h1 class="w-100 fs-3">
-                <%= book.title %>
-
+                <%= book.title %> -
+                  <div class="fw-normal fs-6 d-inline-flex gap-1 align-items-center justify-content-center">
+                    <span class="text-warning fs-3">★</span>
+                    <span class="mt-1">
+                      <%= rate %> <span class="text-secondary "> / 10</span>
+                    </span>
+                  </div>
               </h1>
               <p style="color: #9ab">Escrito por <span style="color: #ddeeff">
                   <%= book.author %>
@@ -68,13 +80,6 @@
           </div>
         </div>
 
-        <div id="rate-review-container" class="rounded mx-auto">
-          <% if (user) { %>
-            <button data-bs-toggle="modal" data-bs-target="#rate" class="btn">Fazer análise</button>
-            <% } else { %>
-              <button data-bs-toggle="modal" data-bs-target="#login" class="btn">Faça login para análise</button>
-              <% } %>
-        </div>
 
         <div id="view-rates" class="w-100" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
           <div class="modal-header">

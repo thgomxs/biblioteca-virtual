@@ -280,10 +280,13 @@ app.get('/:id', async (req: any, res: any) => {
   const userAuthenticated = await checkAuth(authorization);
   var bookLiked = false;
   var bookRead = false;
+  var bookRate = null;
+  var reviewCount = 0;
+  var reviewTotal = 0;
 
   const book = await bookRepo.findOne({
     where: { id: req.params.id },
-    relations: ['likes', 'reads'],
+    relations: ['likes', 'reads', 'reviews'],
   });
 
   if (book && userAuthenticated) {
@@ -297,6 +300,12 @@ app.get('/:id', async (req: any, res: any) => {
         bookRead = true;
       }
     });
+    book.reviews.forEach((review) => {
+      reviewCount++;
+      reviewTotal += parseFloat(review.rating);
+    });
+
+    bookRate = (reviewTotal / reviewCount).toFixed(1);
   }
 
   if (book) {
@@ -305,6 +314,7 @@ app.get('/:id', async (req: any, res: any) => {
       user: userAuthenticated ? userAuthenticated : false,
       liked: bookLiked,
       read: bookRead,
+      rate: bookRate,
     });
   } else {
     res.redirect('/');

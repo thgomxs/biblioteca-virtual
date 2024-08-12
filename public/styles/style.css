@@ -172,8 +172,6 @@ body {
 }
 
 #book-description {
-  height: 350px;
-
   overflow-y: auto;
 }
 
@@ -214,6 +212,15 @@ body {
 }
 
 #stats-container{
+  color: #bcd ;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+#stats-container div {
   background-color: #455567;
+}
+
+#stats-container button{
   color: #bcd;
 }
