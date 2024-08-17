@@ -20,3 +20,6 @@ AppDataSource.initialize()
   .catch((err) => {
     console.error("Erro durante inicialização do banco com TypeORM", err);
   });
+
+export const bookRepo = AppDataSource.getRepository(Book);
+export const userRepo = AppDataSource.getRepository(User);
