@@ -6,11 +6,10 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { Book } from "./entity/Book";
 import { User } from "./entity/User";
+import { Review } from "./entity/Review";
 import { AppDataSource } from "./utils/database";
 import { getBookInfo } from "./services/getBook";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { Review } from "./entity/Review";
+
 import { Like } from "typeorm";
 import cookieParser from "cookie-parser";
 import cookie from "cookie";
@@ -19,6 +18,7 @@ import bookRouter from "./routes/bookRouter";
 import userRouter from "./routes/userRouter";
 import { checkAuth } from "./controllers/authController";
 import { authenticated } from "./middlewares/authenticated";
+import BookService from "./services/bookService";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -76,7 +76,7 @@ io.on("connection", async (socket) => {
 
   sendBooks("socket");
 
-  async function sendReviews(bookID: number, type: string) {
+  async function getReviews(bookID: number, type: string) {
     const book = await bookRepo.findOne({
       where: { id: bookID },
       relations: ["reviews", "reviews.user"],
@@ -121,15 +121,9 @@ io.on("connection", async (socket) => {
 
     if (userAuthenticated) {
       try {
-        const newReview = new Review();
-        newReview.comment = comment;
-        newReview.rating = rating;
-        newReview.book = <Book>await bookRepo.findOne({ where: { id: bookID } });
-        newReview.user = <User>await userRepo.findOne({ where: { id: <number>userAuthenticated.id } });
-        await reviewRepo.save(newReview);
+        await BookService.addReview(bookID, userAuthenticated.id, comment, rating);
 
-        console.log("deu certo");
-        sendReviews(bookID, "io");
+        getReviews(bookID, "io");
         return socket.emit("server:reviewMessage", {
           message: "Avaliação enviada com sucesso!",
           type: "danger",
@@ -144,7 +138,7 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("client:getReviews", async (bookID) => {
-    sendReviews(bookID, "socket");
+    getReviews(bookID, "socket");
   });
 
   async function updateStats(bookID: number) {

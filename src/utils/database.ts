@@ -23,3 +23,4 @@ AppDataSource.initialize()
 
 export const bookRepo = AppDataSource.getRepository(Book);
 export const userRepo = AppDataSource.getRepository(User);
+export const reviewRepo = AppDataSource.getRepository(Review);
