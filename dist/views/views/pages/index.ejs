@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+
+  <body data-bs-theme="dark">
+    <%- include('../partials/header'); %>
+
+    <main class="container my-5">
+      <div class="container col-8" id="container-principal">
+        <div id="search-wrapper"><i class="bi bi-search"></i><input type="text" placeholder="Pesquisar" id="search-input" /></div>
+
+        <form id="form" action="">
+          <div class="input-group mb-5">
+            <span class="input-group-text">Insira a URL do livro</span>
+            <input id="input" type="text" class="form-control" />
+            <button class="btn btn-success" type="submit">Adicionar</button>
+          </div>
+        </form>
+
+        <p class="books-footer lb-item-color text-start w-100 text-uppercase mb-0">livros mais populares</p>
+
+        <div id="books"></div>
+
+        <div class="modal fade" id="view-rates" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title text-center text-uppercase fs-5 fw-bold" id="staticBackdropLabel">AVALIAÇÕES</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body"></div>
+              <div class="modal-footer">
+                <button data-bs-toggle="modal" data-bs-target="#rate" class="btn btn-warning mx-auto text-white">
+                  Avaliar
+                  <i class="bi bi-star"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="rate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-body pt-4 px-5">
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px"></button>
+
+                <div class="d-flex justify-content-center align-items-center gap-4">
+                  <a href="https://www.amazon.com.br/Homem-Mais-Rico-Babilônia/dp/8595081530">
+                    <img src="https://m.media-amazon.com/images/I/41Xc4wyyMIL._SY445_SX342_.jpg" class="img-fluid rounded" width="150" alt="..." />
+                  </a>
+                  <div class="d-flex justify-content-center align-items-start flex-column w-75">
+                    <p class="fw-bold fs-4">O homem mais rico da babilonia</p>
+                    <div class="form-group w-100">
+                      <textarea id="comment" class="form-control" placeholder="Adicione sua análise" style="height: 150px; resize: none" type="text" name="comment" required=""></textarea>
+                    </div>
+
+                    <div class="rating-wrapper">
+                      <div class="rating-star">
+                        <input type="radio" class="star-rate" name="html" data-rate="5" />
+                        <input type="radio" class="star-rate" name="html" data-rate="4.5" />
+                        <input type="radio" class="star-rate" name="html" data-rate="4" />
+                        <input type="radio" class="star-rate" name="html" data-rate="3.5" />
+                        <input type="radio" class="star-rate" name="html" data-rate="3" />
+                        <input type="radio" class="star-rate" name="html" data-rate="2.5" />
+                        <input type="radio" class="star-rate" name="html" data-rate="2" />
+                        <input type="radio" class="star-rate" name="html" data-rate="1.5" />
+                        <input type="radio" class="star-rate" name="html" data-rate="1" />
+                        <input type="radio" class="star-rate" name="html" data-rate="0.5" />
+                      </div>
+                      <i class="bi bi-x-lg ms-2" onclick="resetStars()" style="cursor: pointer"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer" style="border-top: 0; padding-top: 0">
+                <button id="btn-save-rate" class="btn btn-warning text-white" type="submit">
+                  Salvar
+                  <i class="bi bi-star-fill text-white"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./scripts/script.js"></script>
+  </body>
+</html>
