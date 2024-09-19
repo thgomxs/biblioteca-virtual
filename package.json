@@ -9,7 +9,7 @@
     "add-build"
   ],
   "scripts": {
-    "build": "tsc && copyfiles -u 1 src/views/** dist/views",
+    "build": "rimraf dist && tsc && copyfiles -u 1 src/views/** dist/views",
     "build-start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules --no-notify src/index.ts",
     "ts.check": "tsc --project tsconfig.json",
