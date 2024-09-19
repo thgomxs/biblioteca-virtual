@@ -15,6 +15,10 @@
     {
       "src": "/(.*)",
       "dest": "dist/index.js"
+    },
+    {
+      "src": "/(.+\\.[a-z]+)$",
+      "dest": "/public/$1"
     }
   ]
 }
