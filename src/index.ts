@@ -19,6 +19,7 @@ import bookRouter from "./routes/bookRouter";
 import userRouter from "./routes/userRouter";
 import { checkAuth } from "./controllers/authController";
 import { authenticated } from "./middlewares/authenticated";
+import path from "path";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -29,7 +30,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 app.set("view engine", "ejs");
-app.set("views", "./src/views");
+app.set("views", path.join(__dirname, "views"));
 app.use(cookieParser());
 
 interface Token {
