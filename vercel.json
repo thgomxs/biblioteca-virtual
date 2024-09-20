@@ -17,7 +17,7 @@
       "dest": "dist/index.js"
     },
     {
-      "src": "/(.+\\.[a-z]+)$",
+      "src": "/(.+)",
       "dest": "/public/$1"
     }
   ]
