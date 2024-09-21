@@ -18,12 +18,19 @@ import userRouter from "./routes/userRouter";
 import { checkAuth } from "./controllers/authController";
 import { authenticated } from "./middlewares/authenticated";
 import path from "path";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { createClient } from "redis";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
 const server = createServer(app);
 
 const io = new Server(server);
+const redisUrl = process.env.REDIS_URL;
+const pubClient = createClient({ url: redisUrl });
+const subClient = pubClient.duplicate();
+
+io.adapter(createAdapter(pubClient, subClient));
 
 app.use(cors());
 app.use(express.json());
