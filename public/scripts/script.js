@@ -1,4 +1,4 @@
-const socket = io();
+const socket = io.connect("https://biblioteca-virtual-x119.onrender.com/");
 
 const searchInput = document.querySelector("#search-input");
 const urlForm = document.querySelector("#form");
