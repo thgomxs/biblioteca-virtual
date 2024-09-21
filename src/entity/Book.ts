@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany } from 'typeorm';
-import { Review } from './Review';
-import { User } from './User';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany } from "typeorm";
+import { Review } from "./Review";
+import { User } from "./User";
 
 @Entity()
 export class Book {
@@ -17,10 +17,7 @@ export class Book {
   author!: string;
 
   @Column()
-  cover!: string;
-
-  @Column()
-  price!: string;
+  thumbnail!: string;
 
   @Column()
   category!: string;

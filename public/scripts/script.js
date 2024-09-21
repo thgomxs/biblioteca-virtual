@@ -1,4 +1,7 @@
-const socket = io.connect("https://biblioteca-virtual-x119.onrender.com/");
+const socket = io();
+
+const searchContainerAdmin = document.querySelector("#admin-search-container");
+const searchInputAdmin = document.querySelector("#search-input-admin");
 
 const searchInput = document.querySelector("#search-input");
 const urlForm = document.querySelector("#form");
@@ -8,14 +11,12 @@ const books = document.querySelectorAll(".book");
 const loginForm = document.querySelector("#loginForm");
 const registerForm = document.querySelector("#registerForm");
 
-socket.on("server:cleanInput", () => {
-  input.removeAttribute("disabled");
-  input.value = "";
+socket.on("admin-server:cleanInput", () => {
+  searchInputAdmin.removeAttribute("disabled");
+  searchInputAdmin.value = "";
 });
 
 socket.on("server:allBooks", (allBooks) => {
-  console.log("ue");
-
   booksContainer.innerHTML = "";
 
   allBooks.forEach((book) => {
@@ -41,18 +42,11 @@ socket.on("server:searchedBooks", (books) => {
   }
 });
 
-function sendBookURL(e) {
-  e.preventDefault();
-  if (input.value) {
-    socket.emit("client:newBook", input.value);
-    input.setAttribute("disabled", "");
-  }
-}
 function createBook(book) {
   booksContainer.innerHTML += `
   <div class=" book " book-id="${book.id}"  >
       <a href="/${book.id}" >
-      <img src="${book.cover}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-offset="0,15" data-bs-title="${book.title}" class="book-cover rounded" alt="...">
+      <img src="${book.thumbnail}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-offset="0,15" data-bs-title="${book.title}" class="book-cover rounded" alt="...">
       </a>
   </div>
 
@@ -147,7 +141,49 @@ function searchBook() {
   socket.emit("client:searchBook", searchText);
 }
 
-urlForm?.addEventListener("submit", sendBookURL);
+// ADMIN
+function searchBookAdmin() {
+  const query = searchInputAdmin.value;
+
+  if (query.trim() == "") {
+    searchContainerAdmin.innerHTML = "";
+  } else {
+    socket.emit("admin-client:searchBook", query);
+  }
+}
+function sendBookID(id) {
+  console.log(id);
+
+  if (searchInputAdmin.value) {
+    socket.emit("admin-client:newBook", id);
+    searchInputAdmin.setAttribute("disabled", "");
+    searchContainerAdmin.innerHTML = "";
+  }
+}
+socket.on("admin-server:searchedBooks", ({ books, query }) => {
+  let booksElements = "";
+
+  if (books == "Livro não encontrado") {
+    searchContainerAdmin.innerHTML = '              <ul id="list-box"><span class="text-danger">Livro não encontrado</span>              </ul>';
+  } else {
+    books.forEach((book) => {
+      booksElements += `<li onclick="sendBookID('${book.id}')" data-id="${book.id}">
+                    <img src="${book.thumbnail !== "Capa não disponível" ? book.thumbnail : "./images/image-not-available.png"}" alt="Capa do livro" />
+                    <span>${book.title}</span>
+              </li>`;
+    });
+
+    searchContainerAdmin.innerHTML = `
+              <ul id="list-box">
+                ${booksElements}
+                <span style="font-size: 0.8rem"> Resultados encontrados por "<span id="admin-search">${query}</span>"</span>
+              </ul>
+  `;
+  }
+});
+
+urlForm?.addEventListener("submit", sendBookID);
 loginForm?.addEventListener("submit", loginUser);
 registerForm?.addEventListener("submit", registerUser);
 searchInput?.addEventListener("keyup", searchBook);
+searchInputAdmin?.addEventListener("keyup", searchBookAdmin);

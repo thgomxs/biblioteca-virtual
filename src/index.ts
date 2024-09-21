@@ -7,7 +7,7 @@ import { Server } from "socket.io";
 import { Book } from "./entity/Book";
 import { User } from "./entity/User";
 import { AppDataSource } from "./utils/database";
-import { getBookInfo } from "./services/getBook";
+import { getBook, searchBook } from "./services/getBook";
 import { Review } from "./entity/Review";
 import { Like } from "typeorm";
 import cookieParser from "cookie-parser";
@@ -23,12 +23,14 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 const server = createServer(app);
 
-const io = new Server(server, {
-  cors: {
-    origin: "https://biblioteca-virtual-x119.onrender.com/",
-    methods: ["GET", "POST"],
-  },
-});
+const io = new Server(server);
+
+// const io = new Server(server, {
+//   cors: {
+//     origin: "https://biblioteca-virtual-x119.onrender.com/",
+//     methods: ["GET", "POST"],
+//   },
+// });
 
 app.use(cors());
 app.use(express.json());
@@ -71,7 +73,12 @@ io.on("connection", async (socket) => {
   async function sendBooks(type: string) {
     const books = await bookRepo.find();
 
-    socket.emit("server:allBooks", books);
+    if (type == "io") {
+      io.emit("server:allBooks", books);
+    }
+    if (type == "socket") {
+      socket.emit("server:allBooks", books);
+    }
   }
 
   sendBooks("socket");
@@ -84,16 +91,13 @@ io.on("connection", async (socket) => {
 
     const reviews = book?.reviews;
 
-    socket.emit("server:allReviews", reviews);
+    if (type == "io") {
+      io.emit("server:allReviews", reviews);
+    }
+    if (type == "socket") {
+      socket.emit("server:allReviews", reviews);
+    }
   }
-
-  socket.on("client:newBook", async (url) => {
-    const newBook = await getBookInfo(url);
-    await bookRepo.save(newBook);
-
-    socket.emit("server:cleanInput");
-    sendBooks("io");
-  });
 
   socket.on("client:searchBook", async (searchText) => {
     const books = await bookRepo.findBy({ title: Like(`%${searchText}%`) });
@@ -200,6 +204,21 @@ io.on("connection", async (socket) => {
         updateStats(data.bookID);
       }
     }
+  });
+
+  // ADMIN
+  socket.on("admin-client:newBook", async (id) => {
+    const newBook = await getBook(id);
+    if (newBook) {
+      await bookRepo.save(newBook);
+      socket.emit("admin-server:cleanInput");
+      sendBooks("io");
+    }
+  });
+  socket.on("admin-client:searchBook", async (query) => {
+    const books = await searchBook(query);
+
+    socket.emit("admin-server:searchedBooks", { books: books, query: query });
   });
 
   socket.on("disconnect", () => {
