@@ -25,13 +25,6 @@ const server = createServer(app);
 
 const io = new Server(server);
 
-// const io = new Server(server, {
-//   cors: {
-//     origin: "https://biblioteca-virtual-x119.onrender.com/",
-//     methods: ["GET", "POST"],
-//   },
-// });
-
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
