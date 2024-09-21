@@ -25,7 +25,11 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 const server = createServer(app);
 
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "https://biblioteca-virtual-x119.onrender.com/",
+  },
+});
 const redisUrl = process.env.REDIS_URL;
 const pubClient = createClient({ url: redisUrl });
 const subClient = pubClient.duplicate();
