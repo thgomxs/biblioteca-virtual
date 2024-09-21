@@ -24,6 +24,7 @@ const app = express();
 const server = createServer(app);
 
 const io = new Server(server);
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
@@ -65,12 +66,7 @@ io.on("connection", async (socket) => {
   async function sendBooks(type: string) {
     const books = await bookRepo.find();
 
-    if (type == "io") {
-      io.emit("server:allBooks", books);
-    }
-    if (type == "socket") {
-      socket.emit("server:allBooks", books);
-    }
+    socket.emit("server:allBooks", books);
   }
 
   sendBooks("socket");
@@ -83,12 +79,7 @@ io.on("connection", async (socket) => {
 
     const reviews = book?.reviews;
 
-    if (type == "io") {
-      io.emit("server:allReviews", reviews);
-    }
-    if (type == "socket") {
-      socket.emit("server:allReviews", reviews);
-    }
+    socket.emit("server:allReviews", reviews);
   }
 
   socket.on("client:newBook", async (url) => {
