@@ -3,17 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "pre-commit": [
-    "ts.check",
-    "build",
-    "add-build"
-  ],
   "scripts": {
+    "start": "node dist/index.js",
     "build": "rimraf dist && tsc && copyfiles -u 1 src/views/** dist/",
-    "build-start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules --no-notify src/index.ts",
-    "ts.check": "tsc --project tsconfig.json",
-    "add-build": "git add dist"
+    "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules --no-notify src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,8 +17,7 @@
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.4",
-    "pre-commit": "^1.2.2"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
