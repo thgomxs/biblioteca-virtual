@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('../partials/head') %>
+</head>
+
+<body data-bs-theme="dark">
+  <%- include('../partials/header') %>
+
+    <main class="container my-5" user-id="<%= user.id %>">
+      <div class="container col-8" id="container-principal">
+        <p class="books-footer lb-item-color text-start w-100 text-uppercase mb-0">Análises</p>
+        <div id="reviews-container">
+
+        </div>
+      </div>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./scripts/script.js"></script>
+    <script src="./scripts/reviews.js"></script>
+</body>
+
+</html>

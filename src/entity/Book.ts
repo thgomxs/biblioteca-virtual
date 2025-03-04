@@ -1,11 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany } from "typeorm";
-import { Review } from "./Review";
-import { User } from "./User";
+import { Entity, PrimaryColumn, Column, OneToMany, ManyToMany } from 'typeorm';
+import { Review } from './Review';
+import { User } from './User';
 
 @Entity()
 export class Book {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryColumn()
+  id!: string;
 
   @Column()
   title!: string;

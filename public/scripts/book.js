@@ -1,6 +1,6 @@
 const stars = document.querySelectorAll('.star-rate');
 const bookID = document.querySelector('main').getAttribute('book-id');
-const rateSaveButton = document.querySelector('#btn-save-rate');
+const rateSendButton = document.querySelector('#btn-send-rate');
 const rateModal = document.querySelector('#rate');
 const reviewsContainer = document
   .querySelector('#view-rates')
@@ -8,6 +8,27 @@ const reviewsContainer = document
 const bookDescription = document.querySelector('#book-description');
 const likeButton = document.querySelector('.heart-like');
 const readButton = document.querySelector('.book-read');
+const rateForm = document.querySelector('#rate-form');
+const rateWarning = document.querySelector('#rate-warning');
+
+// Fetch all the forms we want to apply custom Bootstrap validation styles to
+var forms = document.querySelectorAll('.needs-validation');
+
+// Loop over them and prevent submission
+Array.prototype.slice.call(forms).forEach(function (form) {
+  form.addEventListener(
+    'submit',
+    function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      form.classList.add('was-validated');
+    },
+    false,
+  );
+});
 
 bookDescription.innerHTML = bookDescription.innerText;
 
@@ -21,7 +42,9 @@ socket.on('server:allReviews', (reviews) => {
       reviewsContainer.innerHTML += `
                         <div class="rate-wrapper d-flex gap-3">
   
-                        <img class="profile-avatar" src="https://s.ltrbxd.com/static/img/avatar80.ccc31669.png" alt="profile avatar" />
+                        <img class="profile-avatar" src="${
+                          review.user.picture
+                        }" alt="profile avatar" />
   
     
                       <div class="rate-info">
@@ -65,11 +88,11 @@ function getStars(number) {
   return stars;
 }
 
-rateSaveButton.onclick = (e) => {
+rateForm.onsubmit = async (e) => {
   e.preventDefault();
-
   const closeRateBtn = rateModal.querySelector('.btn-close');
   const comment = rateModal.querySelector('#comment').value;
+
   let rating = 0;
   stars.forEach((star) => {
     if (star.checked) {
@@ -77,8 +100,22 @@ rateSaveButton.onclick = (e) => {
     }
   });
 
-  closeRateBtn.click();
-  socket.emit('client:newReview', { comment, bookID, rating });
+  if (!rating) {
+    rateWarning.style.opacity = '100%';
+
+    setTimeout(() => {
+      rateWarning.style.opacity = '0%';
+    }, 1500);
+  }
+
+  if (comment !== '' && rating) {
+    rateWarning.style.opacity = 0;
+    closeRateBtn.click();
+    socket.emit('client:newReview', { comment, bookID, rating });
+    setTimeout(() => {
+      rateForm.reset();
+    }, 1000);
+  }
 };
 
 function addStat(stat) {

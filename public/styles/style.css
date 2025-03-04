@@ -119,6 +119,21 @@ body {
   justify-content: space-between;
 }
 
+#username{
+  cursor: not-allowed;
+}
+
+#rate-warning{
+  opacity: 0;
+  transition: .5s;
+  position: relative;
+  left: 1.5rem;
+  padding: .2rem .75rem;
+  color: var(--bs-form-invalid-border-color);
+  border-radius: 25px;
+  border: 1px solid var(--bs-form-invalid-border-color);
+}
+
 .rating-label {
   margin-right: 2rem;
 }
@@ -260,3 +275,54 @@ body {
   width: 40px;
   border-radius: 5px;
 }
+
+.review{
+  display: flex;
+  justify-content: start;
+  align-items: start;
+  gap:1rem;
+  margin-bottom: 2rem;
+  padding: .75rem;
+  border: 1px solid #456;
+  border-radius: 15px;
+  width: 100%;
+}
+
+.review-info{
+  display: flex;
+  width: 100%;
+  position: relative;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+}
+
+.review-info a{
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+.review-buttons{
+  position: relative;
+  bottom: 0px;
+  right: 0px;
+  width: 100%;
+  display: flex;
+  margin-top: .5rem;
+  justify-content: end;
+  align-items: center;
+  gap: .5rem;
+}
+
+.review-comment{
+  margin-top: .5rem;
+  color: #8a99a9 !important; 
+}
+
+.review-cover{
+  width: 76px;
+}
+

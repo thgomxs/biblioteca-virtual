@@ -1,5 +1,5 @@
-import { userRepo } from "../utils/database";
-import jwt from "jsonwebtoken";
+import { userRepo } from '../utils/database';
+import jwt from 'jsonwebtoken';
 
 interface Token {
   username: string;
@@ -14,7 +14,11 @@ export const authenticated = async (token: string) => {
   const user = await userRepo.findOne({ where: { id: userVerified.id } });
 
   if (user) {
-    return { id: user.id, username: user.username };
+    return {
+      id: user.id,
+      username: user.username,
+      picture: user.picture || './images/image-not-available.png',
+    };
   } else {
     return false;
   }

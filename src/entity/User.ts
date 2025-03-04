@@ -20,6 +20,9 @@ export class User {
   @Column()
   password!: string;
 
+  @Column({ type: 'text' })
+  picture!: string;
+
   @OneToMany(() => Review, (review) => review.user)
   reviews!: Review[];
 

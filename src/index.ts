@@ -1,23 +1,24 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
-import express from "express";
-import { createServer } from "node:http";
-import { Server } from "socket.io";
-import { Book } from "./entity/Book";
-import { User } from "./entity/User";
-import { AppDataSource } from "./utils/database";
-import { getBook, searchBook } from "./services/getBook";
-import { Review } from "./entity/Review";
-import { Like } from "typeorm";
-import cookieParser from "cookie-parser";
-import cookie from "cookie";
-import cors from "cors";
-import bookRouter from "./routes/bookRouter";
-import userRouter from "./routes/userRouter";
-import { checkAuth } from "./controllers/authController";
-import { authenticated } from "./middlewares/authenticated";
-import path from "path";
+import express from 'express';
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
+import { Book } from './entity/Book';
+import { User } from './entity/User';
+import { AppDataSource } from './utils/database';
+import { getBookAPI, searchBook } from './services/getBook';
+import { Review } from './entity/Review';
+import { Like } from 'typeorm';
+import cookieParser from 'cookie-parser';
+import cookie from 'cookie';
+import cors from 'cors';
+import bookRouter from './routes/bookRouter';
+import userRouter from './routes/userRouter';
+import { checkAuth } from './controllers/authController';
+import { authenticated } from './middlewares/authenticated';
+import path from 'path';
+import { update } from './controllers/userController';
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -26,10 +27,11 @@ const server = createServer(app);
 const io = new Server(server);
 
 app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "../public")));
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.static(path.join(__dirname, '../public')));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 app.use(cookieParser());
 
 interface Token {
@@ -60,55 +62,88 @@ io.use(async (socket, next) => {
   next();
 });
 
-io.on("connection", async (socket) => {
-  console.log("Usuário entrou na biblioteca!");
-
-  async function sendBooks(type: string) {
-    const books = await bookRepo.find();
-
-    if (type == "io") {
-      io.emit("server:allBooks", books);
-    }
-    if (type == "socket") {
-      socket.emit("server:allBooks", books);
-    }
+io.on('connection', async (socket) => {
+  let route = '';
+  const url = socket.handshake.headers.referer || socket.handshake.headers.origin;
+  if (url) {
+    const pathname = new URL(url).pathname;
+    route = pathname.substring(1);
   }
 
-  sendBooks("socket");
+  console.log('Usuário entrou na biblioteca!');
 
-  async function sendReviews(bookID: number, type: string) {
+  async function sendBooks() {
+    const books = await searchBook('');
+    socket.emit('server:allBooks', books);
+  }
+
+  async function getReviews() {
+    const user = await userRepo.findOne({
+      where: { username: socket.data.user.username },
+    });
+
+    if (user) {
+      const reviews = await reviewRepo.find({
+        where: { user: user },
+        relations: ['book'],
+      });
+      return socket.emit('server:userReviews', reviews);
+    }
+
+    return socket.emit('server:redirect', '/');
+  }
+
+  if (!route) {
+    sendBooks();
+  }
+
+  if (route == 'reviews') {
+    getReviews();
+  }
+
+  async function sendReviews(bookID: string, type: string) {
     const book = await bookRepo.findOne({
       where: { id: bookID },
-      relations: ["reviews", "reviews.user"],
+      relations: ['reviews', 'reviews.user'],
     });
 
     const reviews = book?.reviews;
 
-    if (type == "io") {
-      io.emit("server:allReviews", reviews);
+    if (type == 'io') {
+      io.emit('server:allReviews', reviews);
     }
-    if (type == "socket") {
-      socket.emit("server:allReviews", reviews);
+    if (type == 'socket') {
+      socket.emit('server:allReviews', reviews);
     }
   }
 
-  socket.on("client:searchBook", async (searchText) => {
-    const books = await bookRepo.findBy({ title: Like(`%${searchText}%`) });
+  socket.on('client:updateProfile', async ({ username, picture }) => {
+    const updatedProfile = await update(username, picture);
 
-    socket.emit("server:searchedBooks", books);
-  });
+    if (updatedProfile) {
+      socket.emit('server:updatedProfile', updatedProfile);
 
-  socket.on("client:removeBook", async (bookID) => {
-    const book = await bookRepo.findOne({ where: { id: bookID } });
-
-    if (book) {
-      await bookRepo.remove(book);
+      socket.emit('server:toastMessage', {
+        message: 'Foto alterada com sucesso!',
+        type: 'success',
+      });
     }
 
-    sendBooks("io");
+    if (!updatedProfile) {
+      socket.emit('server:toastMessage', {
+        message: 'Erro ao atualizar foto!',
+        type: 'danger',
+      });
+    }
   });
 
-  socket.on("client:newReview", async ({ comment, bookID, rating }) => {
+  socket.on('client:searchBook', async (searchText) => {
+    const books = await searchBook(searchText);
+
+    socket.emit('server:searchedBooks', books);
+  });
+
+  socket.on('client:newReview', async ({ comment, bookID, rating }) => {
     const userAuthenticated = socket.data.user;
 
     if (userAuthenticated) {
@@ -117,54 +152,55 @@ io.on("connection", async (socket) => {
         newReview.comment = comment;
         newReview.rating = rating;
         newReview.book = <Book>await bookRepo.findOne({ where: { id: bookID } });
-        newReview.user = <User>await userRepo.findOne({ where: { id: <number>userAuthenticated.id } });
+        newReview.user = <User>(
+          await userRepo.findOne({ where: { id: <number>userAuthenticated.id } })
+        );
         await reviewRepo.save(newReview);
 
-        console.log("deu certo");
-        sendReviews(bookID, "io");
-        return socket.emit("server:reviewMessage", {
-          message: "Avaliação enviada com sucesso!",
-          type: "danger",
+        sendReviews(bookID, 'io');
+        return socket.emit('server:toastMessage', {
+          message: 'Avaliação enviada com sucesso!',
+          type: 'success',
         });
       } catch (error) {
-        return socket.emit("server:reviewMessage", {
-          message: "Erro ao enviar avaliação, tente novamente.",
-          type: "danger",
+        return socket.emit('server:toastMessage', {
+          message: 'Erro ao enviar avaliação, tente novamente.',
+          type: 'danger',
         });
       }
     }
   });
 
-  socket.on("client:getReviews", async (bookID) => {
-    sendReviews(bookID, "socket");
+  socket.on('client:getReviews', async (bookID) => {
+    sendReviews(bookID, 'socket');
   });
 
-  async function updateStats(bookID: number) {
+  async function updateStats(bookID: string) {
     const book = await bookRepo.findOne({
       where: { id: bookID },
-      relations: ["likes", "reads"],
+      relations: ['likes', 'reads'],
     });
 
-    socket.emit("server:updateStats", {
+    socket.emit('server:updateStats', {
       likes: book?.likes.length,
       reads: book?.reads.length,
     });
   }
 
-  socket.on("client:addStat", async (data) => {
+  socket.on('client:addStat', async (data) => {
     const userAuthenticated = socket.data.user;
 
     if (userAuthenticated) {
       const user = await userRepo.findOne({ where: { id: userAuthenticated.id } });
       const book = await bookRepo.findOne({
         where: { id: data.bookID },
-        relations: ["likes", "reads"],
+        relations: ['likes', 'reads'],
       });
 
       if (user && book) {
         const stat: string = data.stat;
 
-        if (stat === "likes" || stat === "reads") {
+        if (stat === 'likes' || stat === 'reads') {
           book[stat].push(user);
           await bookRepo.save(book);
         }
@@ -174,20 +210,20 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("client:removeStat", async (data) => {
+  socket.on('client:removeStat', async (data) => {
     const userAuthenticated = socket.data.user;
 
     if (userAuthenticated) {
       const user = await userRepo.findOne({ where: { id: userAuthenticated.id } });
       const book = await bookRepo.findOne({
         where: { id: data.bookID },
-        relations: ["likes", "reads"],
+        relations: ['likes', 'reads'],
       });
 
       if (user && book) {
         const stat: string = data.stat;
 
-        if (stat === "likes" || stat === "reads") {
+        if (stat === 'likes' || stat === 'reads') {
           book[stat] = book[stat].filter((user) => {
             user.id !== userAuthenticated.id;
           });
@@ -199,31 +235,16 @@ io.on("connection", async (socket) => {
     }
   });
 
-  // ADMIN
-  socket.on("admin-client:newBook", async (id) => {
-    const newBook = await getBook(id);
-    if (newBook) {
-      await bookRepo.save(newBook);
-      socket.emit("admin-server:cleanInput");
-      sendBooks("io");
-    }
-  });
-  socket.on("admin-client:searchBook", async (query) => {
-    const books = await searchBook(query);
-
-    socket.emit("admin-server:searchedBooks", { books: books, query: query });
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Usuário saiu da biblioteca :(");
+  socket.on('disconnect', () => {
+    console.log('Usuário saiu da biblioteca :(');
   });
 });
 
-app.get("/", checkAuth, async (req: any, res: any) => {
-  res.render("pages/index", { user: req.user ? req.user : false });
+app.get('/', checkAuth, async (req: any, res: any) => {
+  res.render('pages/index', { user: req.user ? req.user : false });
 });
 
-app.use("/", checkAuth, [userRouter, bookRouter]);
+app.use('/', checkAuth, [userRouter, bookRouter]);
 
 server.listen(PORT, () => {
   console.log(`Rodando na porta ${PORT}`);
