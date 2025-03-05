@@ -11,6 +11,12 @@ const profileForm = document.querySelector('#profileForm');
 const profilePhoto = document.querySelector('#profile-photo');
 const profileAvatar = document.querySelector('#profile-avatar');
 
+function resetStars() {
+  stars.forEach((star) => {
+    star.checked = false;
+  });
+}
+
 socket.on('server:allBooks', (allBooks) => {
   booksContainer.innerHTML = '';
 

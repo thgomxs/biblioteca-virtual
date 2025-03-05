@@ -77,7 +77,7 @@ io.on('connection', async (socket) => {
     socket.emit('server:allBooks', books);
   }
 
-  async function getReviews() {
+  async function getUserReviews() {
     const user = await userRepo.findOne({
       where: { username: socket.data.user.username },
     });
@@ -98,7 +98,7 @@ io.on('connection', async (socket) => {
   }
 
   if (route == 'reviews') {
-    getReviews();
+    getUserReviews();
   }
 
   async function sendReviews(bookID: string, type: string) {
@@ -173,6 +173,58 @@ io.on('connection', async (socket) => {
 
   socket.on('client:getReviews', async (bookID) => {
     sendReviews(bookID, 'socket');
+  });
+
+  socket.on('client:editReview', async ({ comment, reviewID, rating }) => {
+    const review = await reviewRepo.findOne({
+      where: { id: reviewID },
+    });
+
+    if (review) {
+      review.comment = comment;
+      review.rating = rating;
+      await reviewRepo.save(review);
+      getUserReviews();
+      return;
+    }
+
+    return socket.emit('server:toastMessage', {
+      message: 'Essa análise não existe mais!',
+      type: 'danger',
+    });
+  });
+
+  socket.on('client:deleteReview', async (reviewID) => {
+    const review = await reviewRepo.findOne({
+      where: { id: reviewID },
+    });
+
+    if (review) {
+      await reviewRepo.delete(reviewID);
+      getUserReviews();
+      return;
+    }
+
+    return socket.emit('server:toastMessage', {
+      message: 'Essa análise não existe mais!',
+      type: 'danger',
+    });
+  });
+
+  socket.on('client:getReview', async (reviewID) => {
+    const review = await reviewRepo.findOne({
+      where: { id: reviewID },
+      relations: ['book'],
+    });
+
+    if (review) {
+      return socket.emit('server:getReview', review);
+    }
+
+    return socket.emit('server:toastMessage', {
+      message: 'Essa análise não existe mais!',
+      type: 'danger',
+    });
   });
 
   async function updateStats(bookID: string) {

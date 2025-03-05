@@ -17,6 +17,56 @@
       </div>
     </main>
 
+
+    <form id="edit-rate-form" class="needs-validation" novalidate>
+      <div class="modal fade" id="rate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-body pt-4 px-5">
+              <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px"></button>
+
+              <div class="d-flex justify-content-center align-items-center gap-4">
+                <img src="" id="rate-image" class="img-fluid rounded" width="150" alt="..." />
+
+                <div class="d-flex justify-content-center align-items-start flex-column w-75">
+                  <p id="rate-title" class="fw-bold fs-4">
+
+                  </p>
+                  <div class="form-group w-100">
+                    <textarea id="comment" name="comment" class="form-control" placeholder="Adicione sua análise" style="height: 150px; resize: none" required></textarea>
+                  </div>
+
+                  <div class="rating-wrapper">
+
+                    <div class="rating-star">
+                      <input type="radio" class="star-rate" name="html" data-rate="5" />
+                      <input type="radio" class="star-rate" name="html" data-rate="4.5" />
+                      <input type="radio" class="star-rate" name="html" data-rate="4" />
+                      <input type="radio" class="star-rate" name="html" data-rate="3.5" />
+                      <input type="radio" class="star-rate" name="html" data-rate="3" />
+                      <input type="radio" class="star-rate" name="html" data-rate="2.5" />
+                      <input type="radio" class="star-rate" name="html" data-rate="2" />
+                      <input type="radio" class="star-rate" name="html" data-rate="1.5" />
+                      <input type="radio" class="star-rate" name="html" data-rate="1" />
+                      <input type="radio" class="star-rate" name="html" data-rate="0.5" />
+                    </div>
+                    <i class="bi bi-x-lg ms-2" onclick="resetStars()" style="cursor: pointer"></i>
+
+                    <span id="rate-warning">Insira uma avaliação!</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="border-top: 0; padding-top: 0">
+              <button id="btn-send-rate" class="btn btn-warning text-white" type="submit">
+                Atualizar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="./scripts/script.js"></script>
     <script src="./scripts/reviews.js"></script>
